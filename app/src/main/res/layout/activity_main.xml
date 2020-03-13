@@ -30,4 +30,16 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
+    <Button
+        android:id="@+id/gpsPermissionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/give_gps_permission_button" />
+
+    <Button
+        android:id="@+id/gpsOnButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/turn_gps_on_button" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
