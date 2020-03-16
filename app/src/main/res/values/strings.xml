@@ -11,4 +11,11 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="give_gps_permission_button">Give GPS permission</string>
     <string name="turn_gps_on_button">Turn GPS on</string>
+    <string name="turn_gps_off_button">Turn GPS off</string>
+    <string name="start_route">Start route</string>
+    <string name="end_route">End route</string>
+    <string name="traveled_distance">Traveled distance:</string>
+    <string name="traveled_distance_value">0</string>
+    <string name="timePassed">Time passed:</string>
+    <string name="what_do_you_want_to_find">What do you want to find?</string>
 </resources>
