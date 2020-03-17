@@ -22,7 +22,7 @@
         android:layout_marginEnd="40dp"
         android:text="@string/give_gps_permission_button"
         android:background="@color/colorButton"
-        android:onClick="giveGpsPermission()"/>
+        android:onClick="giveGpsPermission"/>
 
 
     <Button
@@ -36,7 +36,7 @@
         android:layout_marginTop="20dp"
         android:background="@color/colorButton"
         android:text="@string/turn_gps_on_button"
-        android:onClick="turnGpsOn()"/>
+        android:onClick="turnGpsOn"/>
 
     <Button
         android:id="@+id/gpsOffButton"
@@ -49,7 +49,7 @@
         android:layout_marginEnd="40dp"
         android:text="@string/turn_gps_off_button"
         android:background="@color/colorButton"
-        android:onClick="turnGpsOff()"/>
+        android:onClick="turnGpsOff"/>
 
     <Button
         android:id="@+id/gpsStartRouteButton"
@@ -62,7 +62,7 @@
         android:layout_marginStart="40dp"
         android:text="@string/start_route"
         android:background="@color/colorButton"
-        android:onClick="startRoute()"/>
+        android:onClick="startRoute"/>
 
     <Button
         android:id="@+id/gpsEndRouteButton"
@@ -75,7 +75,7 @@
         android:layout_marginEnd="40dp"
         android:text="@string/end_route"
         android:background="@color/colorButton"
-        android:onClick="endRoute()"/>
+        android:onClick="endRoute"/>
 
     <TextView
         android:id="@+id/traveledDistanceTextView"
@@ -132,7 +132,7 @@
 
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
-        />
+        android:autofillHints="@string/what_do_you_want_to_find" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/searchButton"
@@ -146,7 +146,6 @@
         android:background="@color/colorButton"
         app:fabSize="auto"
         app:srcCompat="@android:drawable/ic_menu_search"
-        android:onClick="search()"
         />
 
 

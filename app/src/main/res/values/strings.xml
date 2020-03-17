@@ -18,4 +18,7 @@
     <string name="traveled_distance_value">0</string>
     <string name="timePassed">Time passed:</string>
     <string name="what_do_you_want_to_find">What do you want to find?</string>
+    <string name="impossible_to_continue_permission_needed">Impossible to continue! Permission needed</string>
+    <string name="permission_already_granted">Permission already granted!</string>
+    <string name="gps_already_turned_off">Gps already turned off!</string>
 </resources>
