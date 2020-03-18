@@ -14,10 +14,12 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
+import android.os.SystemClock;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,15 +38,16 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
 
+    private Location actualLocation;
+    private Location lastLocation;
 
     private TextView traveledDistanceValueTextView;
     private Chronometer timePassedChronometer;
     private EditText searchEditText;
 
-    private double traveledDistance;
-    private double ticks;
+    private boolean isGpsOn;
 
-    private String searchText;
+    private double traveledDistance = 0D;
 
     private double latitude;
     private double longitude;
@@ -54,97 +57,178 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        traveledDistanceValueTextView = findViewById(R.id.traveledDistanceValueTextView);
+
         timePassedChronometer = findViewById(R.id.timePassedChronometer);
         searchEditText = findViewById(R.id.searchEditText);
 
-        // adiciona o listener no botão
+        timePassedChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+
+                traveledDistance += lastLocation.distanceTo(actualLocation);
+                traveledDistanceValueTextView.setText(String.format(Locale.getDefault(), "%.2f",traveledDistance));
+            }
+        });
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+
+                // A ultima localização passa a ser a atual
+                if(isGpsOn) {
+                    actualLocation = location;
+                    traveledDistance = lastLocation.distanceTo(actualLocation);
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+        };
+
+
         FloatingActionButton fab = findViewById(R.id.searchButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // Pega o valor que foi digitado no inputText
-                searchText = searchEditText.getText().toString();
-
-                Uri uri = Uri.parse(
-                        String.format(
-                                Locale.getDefault(),
-                                "geo:%f,%f?q=%s",
+                Uri gmmIntentUri =
+                        Uri.parse(String.format("geo:%f,%f?q=" +
+                                searchEditText.getText(),
                                 latitude,
-                                longitude,
-                                searchText
-                        )
-                );
-                Intent intent = new Intent (Intent.ACTION_VIEW,
-                        uri);
-                intent.setPackage("com.google.android.apps.maps");
-                startActivity(intent);
+                                longitude))
+                                ;
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+
+                // vai pra tela mostrando o mapa
+                startActivity(mapIntent);
             }
         });
     }
 
-    // solicita ao usuário a permissão para usar o gps
-    public void giveGpsPermission(View v) {
 
-        if(ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            // Exibe toast informando que a permissão já foi concedida
-            Toast.makeText(this ,
-                    getString(R.string.permission_already_granted),
-                    Toast.LENGTH_SHORT)
-                    .show();
+        // solicita ao usuário a permissão para usar o gps
+        public void giveGpsPermission (View v){
+            if (ActivityCompat.checkSelfPermission(
+                    this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this,
+                        getString(R.string.permission_already_granted),
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+            else {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        GPS_REQUEST_CODE
+                );
+            }
         }
-        else{
-            ActivityCompat.requestPermissions(
-                this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                GPS_REQUEST_CODE
-            );
+
+        // Método para ligar o GPS
+        public void turnGpsOn (View v){
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        0, 0, locationListener);
+                isGpsOn = true;
+            }
+            else {
+                Toast.makeText(this,
+                        getString(R.string.impossible_to_continue_permission_needed),
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
         }
-    }
 
-    // Método para ligar o GPS
-    public void turnGpsOn(View v) {
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    0, 0, locationListener);
+        // Desliga GPS
+        public void turnGpsOff (View v){
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.removeUpdates(locationListener);
+                isGpsOn = false;
+            }
+            else {
+                Toast.makeText(this,
+                        getString(R.string.gps_already_turned_off),
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
         }
-        else {
-            Toast.makeText(this ,
-                    getString(R.string.impossible_to_continue_permission_needed),
-                    Toast.LENGTH_SHORT)
-                    .show();
+
+
+        // inicia a rota
+        public void startRoute (View v){
+            if ((ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                    && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                    && isGpsOn) {
+
+                // incializa as duas variaveis
+                this.lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                this.actualLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                // inicia o cronometro
+                timePassedChronometer.start();
+            }
+            else {
+                Toast.makeText(this,
+                        getString(R.string.impossible_to_continue_turn_on_the_gps),
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
         }
-    }
 
-    // Desliga GPS
-    public void turnGpsOff(View v){
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            locationManager.removeUpdates(locationListener);
+        // finaliza a rota
+        public void endRoute (View v){
+            if(isGpsOn){
+                // interrompe a execucao do gps
+                isGpsOn = false;
+
+                // para o cronometro
+                timePassedChronometer.stop();
+                Toast.makeText(this ,
+                        getString(R.string.traveled_distance) +
+                                ":" +
+                                traveledDistance +
+                                "\n" +
+                                getString(R.string.time_passed) +
+                                timePassedChronometer.getText(), Toast.LENGTH_SHORT
+                ).show();
+
+                timePassedChronometer.setBase(SystemClock.elapsedRealtime());
+
+            }
         }
-        else {
-            Toast.makeText(this ,
-                    getString(R.string.gps_already_turned_off),
-                    Toast.LENGTH_SHORT)
-                    .show();
-        }
-    }
-
-
-    public void startRoute(View v){
-
-    }
-
-
-    public void endRoute(View v){
-
-    }
 
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        locationManager.removeUpdates(locationListener);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == GPS_REQUEST_CODE) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+                Toast.makeText(this,  getString(R.string.impossible_to_continue_permission_needed),
+                        Toast.LENGTH_SHORT).show();
+
+            }
+        }
     }
+
 }

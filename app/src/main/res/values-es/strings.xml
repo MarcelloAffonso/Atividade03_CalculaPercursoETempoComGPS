@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Atividade03CalculaPercursoETempoComGPS</string>
+    <string name="action_settings">Configuraciones</string>
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Siguiente</string>
+    <string name="previous">Anterior</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="give_gps_permission_button">Connceder permiso GPS</string>
+    <string name="turn_gps_on_button">Activar GPS</string>
+    <string name="turn_gps_off_button">Desactivar GPS</string>
+    <string name="start_route">Iniciar ruta</string>
+    <string name="end_route">Terminar ruta</string>
+    <string name="traveled_distance">Distancia recorrida:</string>
+    <string name="traveled_distance_value">0</string>
+    <string name="time_passed">Tiempo recorrido:</string>
+    <string name="what_do_you_want_to_find">Que quieres encontrar?</string>
+    <string name="impossible_to_continue_permission_needed">¡Imposible continuar! Se requiere permiso de GPS!</string>
+    <string name="permission_already_granted">¡El permiso ya ha sido otorgado!</string>
+    <string name="gps_already_turned_off">Gps ya ha sido desactivado!</string>
+    <string name="impossible_to_continue_turn_on_the_gps">¡Imposible continuar! Active el GPS</string>
+</resources>
